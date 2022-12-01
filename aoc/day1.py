@@ -66,12 +66,6 @@ def vectorized(fh: TextIO):
     return values
 
 
-
-def process_file(fh: TextIO) -> List[int]:
-    grouper = groupby(fh, lambda line: bool(line.strip()))
-    return [sum(map(int, grp)) for k, grp in grouper if k]
-
-
 def vectorized_main(data_directory: Union[Path, str]):
     with open(data_directory) as fh:
         elves = vectorized(fh)
@@ -81,6 +75,12 @@ def vectorized_main(data_directory: Union[Path, str]):
 
     print("Part 2: Vectorized")
     print(elves[:3].sum())
+
+
+
+def process_file(fh: TextIO) -> List[int]:
+    grouper = groupby(fh, lambda line: bool(line.strip()))
+    return [sum(map(int, grp)) for k, grp in grouper if k]
 
 
 def main(data_directory: Union[Path, str]):
