@@ -36,35 +36,35 @@ The fifth Elf is carrying one food item with 10000 Calories.
 In case the Elves get hungry and need extra snacks, they need to know which Elf to ask: they'd like to know how many Calories are being carried by the Elf carrying the most Calories. In the example above, this is 24000 (carried by the fourth Elf).
 """
 from itertools import groupby
-from operator import itemgetter
 
 
-def part_1(fh):
-    for i, (k, grp) in enumerate(groupby(fh, lambda line: bool(line.strip()))):
+def process_file(fh):
+    for k, grp in groupby(fh, lambda line: bool(line.strip())):
         if not k:
             continue
 
-        i /= 2
+        yield sum(map(int, grp))
 
-        yield i, sum(map(int, grp))
+
+def part_1(elves):
+    return max(elves)
 
 
 def part_2(elves):
-    elves = sorted([qty for _, qty in elves], reverse=True)[:3]
+    elves = sorted(elves, reverse=True)[:3]
     return sum(elves)
 
 
 def main(data_directory):
     with open(data_directory) as fh:
-        print("Part 1")
-        _, val = max(part_1(fh), key=itemgetter(1))
-        print(val)
+        elves = list(process_file(fh))
+    
+    print("Part 1")
+    print(part_1(elves))
 
-        fh.seek(0)
-
-        print("Part 2")
-        val = part_2(part_1(fh))
-        print(val)
+    print("Part 2")
+    val = part_2(elves)
+    print(val)
 
         
 
@@ -89,10 +89,8 @@ if __name__ == "__main__":
 10000"""
 
     with StringIO(content) as fh:
-        idx, val = max(part_1(fh), key=itemgetter(1))
-        assert val == 24000
+        elves = list(process_file(fh))
 
+    assert part_1(elves) == 24000
 
-    with StringIO(content) as fh:
-        elves = part_1(fh)
-        assert part_2(elves) == 45000
+    assert part_2(elves) == 45000
