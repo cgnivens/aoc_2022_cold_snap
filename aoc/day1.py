@@ -39,16 +39,13 @@ from itertools import groupby
 
 
 def process_file(fh):
-    for k, grp in groupby(fh, lambda line: bool(line.strip())):
-        if not k:
-            continue
-
-        yield sum(map(int, grp))
+    grouper = groupby(fh, lambda line: bool(line.strip()))
+    return [sum(map(int, grp)) for k, grp in grouper if k]
 
 
 def main(data_directory):
     with open(data_directory) as fh:
-        elves = sorted(list(process_file(fh)), reverse=True)
+        elves = sorted(process_file(fh), reverse=True)
     
     print("Part 1")
     print(elves[0])
