@@ -36,14 +36,16 @@ The fifth Elf is carrying one food item with 10000 Calories.
 In case the Elves get hungry and need extra snacks, they need to know which Elf to ask: they'd like to know how many Calories are being carried by the Elf carrying the most Calories. In the example above, this is 24000 (carried by the fourth Elf).
 """
 from itertools import groupby
+from pathlib import Path
+from typing import TextIO, Union, List
 
 
-def process_file(fh):
+def process_file(fh: TextIO) -> List[int]:
     grouper = groupby(fh, lambda line: bool(line.strip()))
     return [sum(map(int, grp)) for k, grp in grouper if k]
 
 
-def main(data_directory):
+def main(data_directory: Union[Path, str]):
     with open(data_directory) as fh:
         elves = sorted(process_file(fh), reverse=True)
     
