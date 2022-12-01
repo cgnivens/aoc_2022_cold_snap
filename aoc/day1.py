@@ -77,7 +77,7 @@ if __name__ == "__main__":
 10000"""
 
     with StringIO(content) as fh:
-        elves = list(process_file(fh))
+        elves = sorted(process_file(fh), reverse=True)
 
     assert elves[0] == 24000
 
