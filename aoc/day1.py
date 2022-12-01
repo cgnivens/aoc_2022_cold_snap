@@ -94,9 +94,6 @@ def main(data_directory: Union[Path, str]):
     print(sum(elves[:3]))
 
 
-
-
-
 # Run tests here
 if __name__ == "__main__":
     from io import StringIO 
