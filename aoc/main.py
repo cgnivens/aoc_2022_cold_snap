@@ -1,7 +1,8 @@
 from pathlib import Path
 from .day1 import main as day1
 
-DATA_DIR = Path('.').absolute() / 'data'
+# set the directory off of this filepath specifically
+DATA_DIR = Path(__file__).absolute().parent.parent / 'data'
 
 
 def main():
