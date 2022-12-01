@@ -45,14 +45,15 @@ In the example above, the top three Elves are the fourth Elf (with 24000 Calorie
 Find the top three Elves carrying the most Calories. How many Calories are those Elves carrying in total?
 """
 from itertools import groupby
+from pandas import Series 
 from pathlib import Path
 from typing import TextIO, Union, List
+
+import numpy as np
 
 
 def vectorized(fh: TextIO):
     """Try a vectorized version. Super famcy"""
-    from pandas import Series 
-    import numpy as np
 
     x = Series([int(line) if line else None for line in map(str.strip, fh)], dtype=np.float64)
     values = (
@@ -60,20 +61,26 @@ def vectorized(fh: TextIO):
         .groupby((x.notna() != x.notna().shift()).cumsum())
         .sum()
         .sort_values(ascending=False)
-        .reset_index()
+        .reset_index(drop=True)
     )
-
-    print("Part 1: Vectorized")
-    print(values[0])
-
-    print("Part 2: Vectorized")
-    print(values[:3])
+    return values
 
 
 
 def process_file(fh: TextIO) -> List[int]:
     grouper = groupby(fh, lambda line: bool(line.strip()))
     return [sum(map(int, grp)) for k, grp in grouper if k]
+
+
+def vectorized_main(data_directory: Union[Path, str]):
+    with open(data_directory) as fh:
+        elves = vectorized(fh)
+
+    print("Part 1: Vectorized")
+    print(elves[0])
+
+    print("Part 2: Vectorized")
+    print(elves[:3].sum())
 
 
 def main(data_directory: Union[Path, str]):
@@ -84,8 +91,10 @@ def main(data_directory: Union[Path, str]):
     print(elves[0])
 
     print("Part 2")
-    val = sum(elves[:3])
-    print(val)
+    print(sum(elves[:3]))
+
+
+
 
 
 # Run tests here
