@@ -49,6 +49,28 @@ from pathlib import Path
 from typing import TextIO, Union, List
 
 
+def vectorized(fh: TextIO):
+    """Try a vectorized version. Super famcy"""
+    from pandas import Series 
+    import numpy as np
+
+    x = Series([int(line) if line else None for line in map(str.strip, fh)], dtype=np.float64)
+    values = (
+        x
+        .groupby((x.notna() != x.notna().shift()).cumsum())
+        .sum()
+        .sort_values(ascending=False)
+        .reset_index()
+    )
+
+    print("Part 1: Vectorized")
+    print(values[0])
+
+    print("Part 2: Vectorized")
+    print(values[:3])
+
+
+
 def process_file(fh: TextIO) -> List[int]:
     grouper = groupby(fh, lambda line: bool(line.strip()))
     return [sum(map(int, grp)) for k, grp in grouper if k]
