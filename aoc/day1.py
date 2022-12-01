@@ -46,24 +46,15 @@ def process_file(fh):
         yield sum(map(int, grp))
 
 
-def part_1(elves):
-    return max(elves)
-
-
-def part_2(elves):
-    elves = sorted(elves, reverse=True)[:3]
-    return sum(elves)
-
-
 def main(data_directory):
     with open(data_directory) as fh:
-        elves = list(process_file(fh))
+        elves = sorted(list(process_file(fh)), reverse=True)
     
     print("Part 1")
-    print(part_1(elves))
+    print(elves[0])
 
     print("Part 2")
-    val = part_2(elves)
+    val = sum(elves[:3])
     print(val)
 
         
@@ -91,6 +82,6 @@ if __name__ == "__main__":
     with StringIO(content) as fh:
         elves = list(process_file(fh))
 
-    assert part_1(elves) == 24000
+    assert elves[0] == 24000
 
-    assert part_2(elves) == 45000
+    assert sum(elves[:3]) == 45000
