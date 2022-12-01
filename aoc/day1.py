@@ -56,8 +56,6 @@ def main(data_directory: Union[Path, str]):
     val = sum(elves[:3])
     print(val)
 
-        
-
 
 # Run tests here
 if __name__ == "__main__":
