@@ -114,8 +114,11 @@ C Z"""
     with StringIO(content) as fh:
         strategy = list(process_file(fh))
 
-    print(part1(strategy))
+    # print(part1(strategy))
 
     assert part1(strategy) == 15
+
+
+    assert part2(strategy) == 12
 
     
