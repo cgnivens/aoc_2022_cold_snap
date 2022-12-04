@@ -30,8 +30,9 @@ In the above example, the priority of the item type that appears in both compart
 Find the item type that appears in both compartments of each rucksack. What is the sum of the priorities of those item types?
 """
 from io import StringIO
+from pathlib import Path
 from string import ascii_letters
-from typing import TextIO
+from typing import TextIO, Union
 
 PRIORITY = {letter: i for i, letter in enumerate(ascii_letters, start=1)}
 
@@ -46,6 +47,14 @@ def process_file(fh: TextIO):
 def part1(rucksacks):
     in_both = ((set(left) & set(right)).pop() for left, right in rucksacks)
     return sum((PRIORITY[letter] for letter in in_both))
+
+
+
+def main(datafile: Union[Path, str]):
+    with open(datafile) as fh:
+        rucksacks = list(process_file(fh))
+
+    print(f"Part 1: {part1(rucksacks)}")
 
 
 
