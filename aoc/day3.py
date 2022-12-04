@@ -29,3 +29,32 @@ In the above example, the priority of the item type that appears in both compart
 
 Find the item type that appears in both compartments of each rucksack. What is the sum of the priorities of those item types?
 """
+from io import StringIO
+from string import ascii_letters
+from typing import TextIO
+
+PRIORITY = {letter: i for i, letter in enumerate(ascii_letters, start=1)}
+
+
+def process_file(fh: TextIO):
+    for line in map(str.strip, fh):
+        midpoint = len(line) // 2
+        yield line[:midpoint], line[midpoint:]
+
+
+
+
+
+if __name__ == "__main__":
+    content = """vJrwpWtwJgWrhcsFMMfFFhFp
+jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
+PmmdzqPrVvPwwTWBwg
+wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
+ttgJtRGJQctTZtZT
+CrZsJsPPZsGzwwsLwLmpwMDw"""
+
+    with StringIO(content) as fh:
+        halves = list(process_file(fh))
+
+    for left, right in halves:
+        assert len(left) == len(right), f"Left: ({len(left)}, {left}), Right: ({len(right)}, {right})"
