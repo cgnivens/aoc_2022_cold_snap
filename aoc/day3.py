@@ -56,6 +56,7 @@ Find the item type that corresponds to the badges of each three-Elf group. What 
 """
 from io import StringIO
 from itertools import islice
+from functools import reduce
 from pathlib import Path
 from string import ascii_letters
 from typing import Iterable, Iterator, TextIO, Union
@@ -96,6 +97,12 @@ def part2(fh: TextIO):
     return total
 
 
+def combined(it: Iterator):
+    in_grp = (reduce(lambda x, y: x.intersection(y), b, set(a)).pop() for a, *b in it)
+    value = sum(PRIORITY[value] for value in in_grp)
+    return value
+
+
 
 def main(datafile: Union[Path, str]):
     with open(datafile) as fh:
@@ -128,5 +135,14 @@ CrZsJsPPZsGzwwsLwLmpwMDw"""
 
     with StringIO(content) as fh:
         assert part2(fh) == 70
+
+
+    with StringIO(content) as fh:
+        halves = list(process_file(fh))
+        fh.seek(0)
+        rucksacks = list(batched(fh, 3))
+
+    assert combined(halves) == 157
+    assert combined(rucksacks) == 70
 
     
