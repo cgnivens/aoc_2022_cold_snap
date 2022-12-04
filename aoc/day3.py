@@ -43,6 +43,12 @@ def process_file(fh: TextIO):
 
 
 
+def part1(rucksacks):
+    in_both = ((set(left) & set(right)).pop() for left, right in rucksacks)
+    return sum((PRIORITY[letter] for letter in in_both))
+
+
+
 
 
 if __name__ == "__main__":
@@ -58,3 +64,7 @@ CrZsJsPPZsGzwwsLwLmpwMDw"""
 
     for left, right in halves:
         assert len(left) == len(right), f"Left: ({len(left)}, {left}), Right: ({len(right)}, {right})"
+
+    assert part1(halves) == 157
+
+    
