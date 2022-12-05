@@ -53,7 +53,7 @@ So, in this example, the number of overlapping assignment pairs is 4.
 In how many assignment pairs do the ranges overlap?
 """
 from pathlib import Path
-from typing import Iterator, TextIO, Union
+from typing import Iterable, Iterator, TextIO, Tuple, Union
 
 
 def process_file(fh: TextIO) -> Iterator[range]:
@@ -64,7 +64,7 @@ def process_file(fh: TextIO) -> Iterator[range]:
         
 
 
-def part1(assignments):
+def part1(assignments: Iterable[Tuple[int]]) -> Iterator[bool]:
 
     for (a_start, a_end), (b_start, b_end) in assignments:
         if a_start >= b_start and a_end <= b_end:
@@ -75,7 +75,7 @@ def part1(assignments):
             yield False
 
 
-def part2(assignments):
+def part2(assignments: Iterable[Tuple[int]]) -> Iterator[bool]:
     for (a_start, a_end), (b_start, b_end) in assignments:
         a, b = range(a_start, a_end + 1), range(b_start, b_end + 1)
 
