@@ -42,6 +42,7 @@ def sliding_window(it, n):
 
     while True:
         char = next(it, '')
+
         if not char:
             break
         else:
@@ -54,7 +55,7 @@ def sliding_window(it, n):
 
 
 def process_file(fh):
-    yield from sliding_window(fh.read(), 4)
+    yield from sliding_window(fh.read().strip(), 4)
 
 
 def find_marker(chunks):
