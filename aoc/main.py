@@ -3,6 +3,7 @@ from .day1 import main as day1
 from .day2 import main as day2
 from .day3 import main as day3
 from .day4 import main as day4
+from .day5 import main as day5
 
 # set the directory off of this filepath specifically
 DATA_DIR = Path(__file__).absolute().parent.parent / 'data'
@@ -27,3 +28,8 @@ def main():
     print('Running Day 4')
     print('-'*20)
     day4(DATA_DIR / 'day4_input.txt')
+    print('\n'*2)
+
+    print('Running Day 5')
+    print('-'*20)
+    day5(DATA_DIR / 'day5_input.txt')

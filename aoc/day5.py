@@ -52,25 +52,50 @@ The Elves just need to know which crate will end up on top of each stack; in thi
 from itertools import groupby
 import re
 from collections import defaultdict, deque
+from operator import itemgetter
 
 def process_file(fh):
     instructions = re.compile(r"(\d)+")
-    box_whitespace = re.compile(r"(\s{4}|\s{1})+")
+    crate_regex = re.compile(r"(\S{3}\s|\s{4})")
 
     while True:
-        line = next(fh).strip('\n')
+        line = next(fh)
 
-        if not line:
-            yield line
+        if not line.strip():
+            yield None
             break
         elif not '[' in line:
             continue
         
-        boxes = [box.strip().replace('[', '').replace(']', '') for box in box_whitespace.split(line) if box]
+        boxes = [box.strip().replace('[', '').replace(']', '') for box in crate_regex.findall(line)]
         yield boxes
 
     for line in fh:
         yield [int(instruction) for instruction in instructions.findall(line.strip())]
+
+
+def process_stacks(crates):
+    stacks = defaultdict(deque)
+
+    for group in crates:
+        for i, item in enumerate(group, start=1):
+            if not item:
+                continue
+            stacks[i].appendleft(item)
+
+    return stacks
+
+
+def process_instructions(instructions, stacks):
+    for amt, from_, to_ in instructions:
+        for _ in range(amt):
+            try:
+                val = stacks[from_].pop()
+                stacks[to_].append(val)
+            except:
+                continue
+
+    return stacks
 
 
 def main(datafile):
@@ -78,16 +103,11 @@ def main(datafile):
         lines = process_file(fh)
         crates, instructions = [list(grp) for k, grp in groupby(lines, key=bool) if k]
 
-    stacks = defaultdict(deque)
-
-    for group in zip(*crates):
-        for i, item in enumerate(group, start=1):
-            if not item:
-                continue
-            stacks[i].appendleft(item)
-    
-    # print(crates, instructions)
+    stacks = process_stacks(crates)
+    stacks = process_instructions(instructions, stacks)
     print(stacks)
+
+    print(f"Part 1: {''.join(stack.pop() if stack else '' for i, stack in sorted(stacks.items(), key=itemgetter(0)))}")
 
 
 if __name__ == "__main__":
@@ -107,13 +127,9 @@ move 1 from 1 to 2"""
         lines = process_file(fh)
         crates, instructions = [list(grp) for k, grp in groupby(lines, key=bool) if k]
 
-    print(crates, instructions)
-    stacks = defaultdict(deque)
+    stacks = process_stacks(crates)
+    stacks = process_instructions(instructions, stacks)
 
-    for group in crates:
-        for i, item in enumerate(group, start=1):
-            if not item:
-                continue
-            stacks[i].appendleft(item)
+    assert ''.join(stacks[i].pop() for i in sorted(stacks)) == 'CMZ'
 
-    print(stacks)
+    
