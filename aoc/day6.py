@@ -34,3 +34,55 @@ nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg: first marker after character 10
 zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw: first marker after character 11
 How many characters need to be processed before the first start-of-packet marker is detected?
 """
+def sliding_window(it, n):
+    it = iter(it)
+    chunk = ''.join(next(it, '') for _ in range(n))
+    i = len(chunk)
+    yield i, chunk
+
+    while True:
+        char = next(it, '')
+        if not char:
+            break
+        else:
+            i += 1
+        
+        chunk = ''.join((chunk[1:], char))
+        yield i, chunk
+
+
+
+
+def process_file(fh):
+    yield from sliding_window(fh.read(), 4)
+
+
+def find_marker(chunks):
+    chars = set()
+
+    for i, chunk in chunks:
+        chars.update(chunk)
+
+        if len(chars) == 4:
+            return i
+
+        chars.clear()
+
+
+
+def main(datafile):
+    with open(datafile) as fh:
+        lines = process_file(fh)
+        print(f"Part 1: {find_marker(lines)}")
+
+
+if __name__ == "__main__":
+    from io import StringIO
+
+    content = "mjqjpqmgbljsphdztnvjfqwrcgsmlb"
+
+    with StringIO(content) as fh:
+        lines = process_file(fh)
+        val = find_marker(lines)
+        print(val)
+        assert val == 7
