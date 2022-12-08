@@ -33,7 +33,9 @@ $ ls
 8033020 d.log
 5626152 d.ext
 7214296 k
-The filesystem consists of a tree of files (plain data) and directories (which can contain other directories or files). The outermost directory is called /. You can navigate around the filesystem, moving into or out of directories and listing the contents of the directory you're currently in.
+The filesystem consists of a tree of files (plain data) and directories (which can contain other directories or files). 
+The outermost directory is called /. You can navigate around the filesystem, moving into or out of directories and 
+listing the contents of the directory you're currently in.
 
 Within the terminal output, lines that begin with $ are commands you executed, very much like some modern computers:
 
@@ -60,17 +62,175 @@ Given the commands and output in the example above, you can determine that the f
     - d.log (file, size=8033020)
     - d.ext (file, size=5626152)
     - k (file, size=7214296)
-Here, there are four directories: / (the outermost directory), a and d (which are in /), and e (which is in a). These directories also contain files of various sizes.
+Here, there are four directories: / (the outermost directory), a and d (which are in /), and e (which is in a). 
+These directories also contain files of various sizes.
 
-Since the disk is full, your first step should probably be to find directories that are good candidates for deletion. To do this, you need to determine the total size of each directory. The total size of a directory is the sum of the sizes of the files it contains, directly or indirectly. (Directories themselves do not count as having any intrinsic size.)
+Since the disk is full, your first step should probably be to find directories that are good candidates for deletion. 
+To do this, you need to determine the total size of each directory. The total size of a directory is the sum of the 
+sizes of the files it contains, directly or indirectly. (Directories themselves do not count as having any intrinsic size.)
 
 The total sizes of the directories above can be found as follows:
 
 The total size of directory e is 584 because it contains a single file i of size 584 and no other directories.
-The directory a has total size 94853 because it contains files f (size 29116), g (size 2557), and h.lst (size 62596), plus file i indirectly (a contains e which contains i).
+The directory a has total size 94853 because it contains files f (size 29116), g (size 2557), and h.lst (size 62596), 
+plus file i indirectly (a contains e which contains i).
+
 Directory d has total size 24933642.
+
 As the outermost directory, / contains every file. Its total size is 48381165, the sum of the size of every file.
-To begin, find all of the directories with a total size of at most 100000, then calculate the sum of their total sizes. In the example above, these directories are a and e; the sum of their total sizes is 95437 (94853 + 584). (As in this example, this process can count files more than once!)
+To begin, find all of the directories with a total size of at most 100000, then calculate the sum of their total sizes. 
+In the example above, these directories are a and e; the sum of their total sizes is 95437 (94853 + 584). 
+(As in this example, this process can count files more than once!)
 
 Find all of the directories with a total size of at most 100000. What is the sum of the total sizes of those directories?
 """
+from collections import namedtuple
+from itertools import groupby, chain
+from operator import attrgetter
+from pprint import pprint
+
+File = namedtuple("File", ('size', 'name'))
+Folder = namedtuple("Folder", ('name', 'files'))
+
+
+class Directory:
+    def __init__(self, name, prev=None):
+        self.name = name
+        self.folders = []
+        self.files = []
+        self.prev = prev
+
+    @property
+    def size(self):
+        if getattr(self, 'size_', None) is not None:
+            return self.size_
+
+        self.size_ = sum(file[0] for file in self.files)
+        self.size_ += sum(folder.size for folder in self.folders)
+        return self.size_
+
+
+    def __str__(self):
+        return f"Directory({self.name}, dirs={[folder.name for folder in self.folders]}, files={self.files})"
+
+
+    def __repr__(self):
+        return str(self)
+
+
+def do_ls(lines):
+    line = ''
+    folders, files = [], []
+    while True:
+        line = next(fh, '').strip()
+        
+        if line.startswith('$'):
+            lines = chain([line], lines)
+            break
+        elif not line:
+            break
+
+        ftype, fname = line.rsplit(' ', 1)
+
+        if ftype.isnumeric():
+            files.append((int(ftype), fname))
+        else:
+            folders.append((fname))
+
+    return folders, files, lines
+
+
+        
+
+# TODO: Fix, this is horrendous
+def process_file(fh):
+    yield from map(str.strip, fh)
+
+
+def crawl_directory(lines):
+    directory = Directory(name='/', prev='/')
+    tree = {'/': directory}
+
+    while True:
+        line = next(lines, '').strip()
+
+        if not line:
+            break
+
+        if line == '$ ls':
+            folders, files, lines = do_ls(lines)
+            for folder in folders:
+                f = Directory(folder, prev=directory.name)
+                directory.folders.append(f)
+                tree[folder] = f
+
+            directory.files.extend(files)
+
+        elif line.startswith('$ cd'):
+            _, name = line.rsplit(' ', 1)
+            if name == '..':
+                directory = tree[directory.prev]
+                continue
+
+            if name in tree:
+                directory = tree[name]
+                continue 
+
+            prev = directory 
+
+            directory = Directory(name=name, prev=prev.name)
+            tree[name] = directory
+
+    return tree
+
+
+def main(datafile):
+    with open(datafile) as fh:
+        lines = process_file(fh)
+        tree = crawl_directory(lines)
+
+    tot = 0
+    for folder in tree.values():
+        size = folder.size 
+
+        if size <= 100000:
+            tot += size
+
+    print(f"Part 1: {tot}")
+
+    
+
+
+
+
+if __name__ == "__main__":
+    from io import StringIO
+    content = """$ cd /
+$ ls
+dir a
+14848514 b.txt
+8504156 c.dat
+dir d
+$ cd a
+$ ls
+dir e
+29116 f
+2557 g
+62596 h.lst
+$ cd e
+$ ls
+584 i
+$ cd ..
+$ cd ..
+$ cd d
+$ ls
+4060174 j
+8033020 d.log
+5626152 d.ext
+7214296 k"""
+    
+    with StringIO(content) as fh:
+        tree = crawl_directory(process_file(fh))
+
+    size = sum(map(attrgetter('size'), filter(lambda x: x.size <= 100000, tree.values())))
+    assert size == 95437, size
