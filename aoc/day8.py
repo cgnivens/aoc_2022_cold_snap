@@ -83,11 +83,30 @@ def is_visible(line, rev=False):
 
     is_visible(line[::-1], True)
 
-    
-
 
 def part1(trees):
-    return None
+    trees = get_perimeter(trees)
+
+    for row in trees:
+        is_visible(row)
+
+    for col in zip(*trees):
+        is_visible(col)
+
+    return sum(tree.visible for row in trees for tree in row)
+
+    
+def main(datafile):
+    with open(datafile) as fh:
+        trees = list(process_file(fh))
+        
+    value = part1(trees)
+    print(f"Part 1: {value}")
+
+    for tree in trees:
+        tree.visible = False
+
+
 
 
 if __name__ == "__main__":
