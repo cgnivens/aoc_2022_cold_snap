@@ -49,7 +49,6 @@ class Tree:
 def process_file(fh):
     for line in fh:
         thing = [Tree(int(tree), False) for tree in line.strip()]
-        print(thing)
         yield thing
 
 
@@ -71,17 +70,11 @@ def get_perimeter(trees):
 
 def is_visible(line, rev=False):
     tallest = 0
-    print('Line:')
-    print(line)
 
     for tree in line:
-        if tree.visible:
-            continue
-
         height = tree.height
-        print(f"Height: {height} Tallest: {tallest}")
+
         if height > tallest:
-            print('taller')
             tree.visible = True
             tallest = height
         
@@ -120,13 +113,6 @@ if __name__ == "__main__":
         is_visible(col)
 
     tot = sum(tree.visible for row in trees for tree in row)
-    print(tot)
-
-    for row in trees:
-        print(row)
-
-    for row in trees:
-        print(''.join(map(lambda x: str(x.visible)[0], row)))
 
     assert tot == 21
 
