@@ -37,39 +37,60 @@ With 16 trees visible on the edge and another 5 visible in the interior, a total
 
 Consider your map; how many trees are visible from outside the grid?
 """
+from dataclasses import dataclass
+from itertools import chain
+
+@dataclass
+class Tree:
+    height: int
+    visible: bool
+
 
 def process_file(fh):
     for line in fh:
-        yield [int(tree) for tree in line.strip()]
+        thing = [Tree(int(tree), False) for tree in line.strip()]
+        print(thing)
+        yield thing
 
 
 def get_perimeter(trees):
-    length = len(next(zip(*trees)))
-    height = len(trees[0])
-    return (length + height) * 2 - 4
+    left, *_, right = list(zip(*trees))
+
+    for tree in chain(left, right):
+        tree.visible = True
+
+    top, *_, bottom = trees
+
+    for tree in chain(top, bottom):
+        tree.visible = True
+
+    return trees
+
+    
 
 
 def is_visible(line, rev=False):
-    visible = {}
-    tallest = line[0]
-    for tree in enumerate(line[1:-1], start=1):
-        if tree > tallest:
-            visible[tree] = True
-            tallest = tree
-        
+    tallest = 0
+    print('Line:')
+    print(line)
 
-    if rev:
-        return visible
-
-    newvis = is_visible(line[::-1], True)
-
-    for k, v in newvis:
-        if not v:
+    for tree in line:
+        if tree.visible:
             continue
 
-        visible[k] = v
+        height = tree.height
+        print(f"Height: {height} Tallest: {tallest}")
+        if height > tallest:
+            print('taller')
+            tree.visible = True
+            tallest = height
+        
+    if rev:
+        return
 
-    return visible
+    is_visible(line[::-1], True)
+
+    
 
 
 def part1(trees):
@@ -84,16 +105,29 @@ if __name__ == "__main__":
 65332
 33549
 35390"""
+    print("Sample trees:")
+    print(content)
 
     with StringIO(content) as fh:
         trees = list(process_file(fh))
 
-    perimiter = get_perimeter(trees)
-    rows = sum(sum(is_visible(row)) for row in trees)
-    cols = sum(sum(is_visible(col)) for col in zip(*trees))
+    trees = get_perimeter(trees)
 
-    print(perimiter, rows, cols)
+    for row in trees:
+        is_visible(row)
 
-    assert perimiter + rows + cols == 21
+    for col in zip(*trees):
+        is_visible(col)
+
+    tot = sum(tree.visible for row in trees for tree in row)
+    print(tot)
+
+    for row in trees:
+        print(row)
+
+    for row in trees:
+        print(''.join(map(lambda x: str(x.visible)[0], row)))
+
+    assert tot == 21
 
     # part1(trees)
