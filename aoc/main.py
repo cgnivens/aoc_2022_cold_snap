@@ -24,8 +24,8 @@ def main():
         day8,
     )
 
-    for i, f in enumerate(funcs, start=1):
+    for i, func in enumerate(funcs, start=1):
         print(f"Running Day {i}")
         print('-'*20)
-        f(DATA_DIR / 'day{i}_input.txt')
+        func(DATA_DIR / f'day{i}_input.txt')
         print('\n'*2)
