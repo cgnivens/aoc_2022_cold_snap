@@ -33,6 +33,20 @@ nppdvjthqldpwncqszvftbrmjlhg: first marker after character 6
 nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg: first marker after character 10
 zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw: first marker after character 11
 How many characters need to be processed before the first start-of-packet marker is detected?
+
+--- Part Two ---
+Your device's communication system is correctly detecting packets, but still isn't working. It looks like it also needs to look for messages.
+
+A start-of-message marker is just like a start-of-packet marker, except it consists of 14 distinct characters rather than 4.
+
+Here are the first positions of start-of-message markers for all of the above examples:
+
+mjqjpqmgbljsphdztnvjfqwrcgsmlb: first marker after character 19
+bvwbjplbgvbhsrlpgdmjqwftvncz: first marker after character 23
+nppdvjthqldpwncqszvftbrmjlhg: first marker after character 23
+nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg: first marker after character 29
+zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw: first marker after character 26
+How many characters need to be processed before the first start-of-message marker is detected?
 """
 def sliding_window(it, n):
     it = iter(it)
@@ -54,17 +68,17 @@ def sliding_window(it, n):
 
 
 
-def process_file(fh):
-    yield from sliding_window(fh.read().strip(), 4)
+def process_file(fh, n=4):
+    yield from sliding_window(fh.read().strip(), n)
 
 
-def find_marker(chunks):
+def find_marker(chunks, n=4):
     chars = set()
 
     for i, chunk in chunks:
         chars.update(chunk)
 
-        if len(chars) == 4:
+        if len(chars) == n:
             return i
 
         chars.clear()
@@ -76,6 +90,11 @@ def main(datafile):
         lines = process_file(fh)
         print(f"Part 1: {find_marker(lines)}")
 
+        fh.seek(0)
+
+        lines = process_file(fh, n=14)
+        print(f"Part 2: {find_marker(lines, n=14)}")
+
 
 if __name__ == "__main__":
     from io import StringIO
@@ -85,5 +104,18 @@ if __name__ == "__main__":
     with StringIO(content) as fh:
         lines = process_file(fh)
         val = find_marker(lines)
-        print(val)
         assert val == 7
+
+    contents = (
+        ("mjqjpqmgbljsphdztnvjfqwrcgsmlb", 19),
+        ("bvwbjplbgvbhsrlpgdmjqwftvncz", 23),
+        ("nppdvjthqldpwncqszvftbrmjlhg", 23),
+        ("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", 29),
+        ("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", 26),
+    )
+
+    for content, length in contents:
+        with StringIO(content) as fh:
+            lines = process_file(fh, n=14)
+            val = find_marker(lines, n=14)
+            assert val == length
