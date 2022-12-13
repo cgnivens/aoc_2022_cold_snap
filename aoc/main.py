@@ -4,32 +4,28 @@ from .day2 import main as day2
 from .day3 import main as day3
 from .day4 import main as day4
 from .day5 import main as day5
+from .day6 import main as day6
+from .day7 import main as day7
+from .day8 import main as day8
 
 # set the directory off of this filepath specifically
 DATA_DIR = Path(__file__).absolute().parent.parent / 'data'
 
 
 def main():
-    print('Running Day 1')
-    print('-'*20)
-    day1(DATA_DIR / 'day1_input.txt')
-    print('\n'*2)
+    funcs = (
+        day1,
+        day2,
+        day3,
+        day4,
+        day5,
+        day6,
+        day7,
+        day8,
+    )
 
-    print('Running Day 2')
-    print('-'*20)
-    day2(DATA_DIR / 'day2_input.txt')
-    print('\n'*2)
-
-    print('Running Day 3')
-    print('-'*20)
-    day3(DATA_DIR / 'day3_input.txt')
-    print('\n'*2)
-
-    print('Running Day 4')
-    print('-'*20)
-    day4(DATA_DIR / 'day4_input.txt')
-    print('\n'*2)
-
-    print('Running Day 5')
-    print('-'*20)
-    day5(DATA_DIR / 'day5_input.txt')
+    for i, f in enumerate(funcs, start=1):
+        print(f"Running Day {i}")
+        print('-'*20)
+        f(DATA_DIR / 'day{i}_input.txt')
+        print('\n'*2)
