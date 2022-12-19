@@ -103,8 +103,9 @@ def main(datafile):
     value = part1(trees)
     print(f"Part 1: {value}")
 
-    for tree in trees:
-        tree.visible = False
+    for row in trees:
+        for tree in row:
+            tree.visible = False
 
 
 
