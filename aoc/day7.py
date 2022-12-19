@@ -241,8 +241,12 @@ def main(datafile):
 
     print(f"Part 1: {tot}")
 
-    
+    free_space = 70000000 - tree['/'].size
+    space_required = 30000000 - free_space
 
+
+    smallest = min(filter(lambda x: x.size > space_required, tree.values()), key=attrgetter('size'))
+    print(f"Part 2: {smallest.size}")
 
 
 
