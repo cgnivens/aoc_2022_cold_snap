@@ -67,7 +67,13 @@ def process_file(fh):
         elif not '[' in line:
             continue
         
-        boxes = [box.strip().replace('[', '').replace(']', '') for box in crate_regex.findall(line)]
+        boxes = [
+            (
+                box
+                .strip()
+                .replace('[', '')
+                .replace(']', '')
+            ) for box in crate_regex.findall(line)]
         yield boxes
 
     for line in fh:
