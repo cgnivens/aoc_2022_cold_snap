@@ -121,7 +121,7 @@ Folder = namedtuple("Folder", ('name', 'files'))
 
 class Directory:
     def __init__(self, name, prev=None):
-        self.name = name
+        self.name = name if not prev else os.path.join(prev, name)
         self.folders = []
         self.files = []
         self.prev = prev
@@ -134,6 +134,21 @@ class Directory:
         self.size_ = sum(file[0] for file in self.files)
         self.size_ += sum(folder.size for folder in self.folders)
         return self.size_
+
+    @property
+    def parent(self):
+        if getattr(self, 'parents_', None) is not None:
+            return '/'.join(self.parents_)
+        prev = self.prev
+        curr = self
+        curr.parents_ = []
+        while prev:
+            curr.parents_.append(prev)
+            curr = prev 
+            prev = prev.prev
+
+        return '/'.join(self.parents_)
+
 
 
     def __str__(self):
@@ -148,7 +163,7 @@ def do_ls(lines):
     line = ''
     folders, files = [], []
     while True:
-        line = next(fh, '').strip()
+        line = next(lines, '').strip()
         
         if line.startswith('$'):
             lines = chain([line], lines)
@@ -188,7 +203,7 @@ def crawl_directory(lines):
             for folder in folders:
                 f = Directory(folder, prev=directory.name)
                 directory.folders.append(f)
-                tree[folder] = f
+                tree[f.name] = f
 
             directory.files.extend(files)
 
@@ -198,14 +213,16 @@ def crawl_directory(lines):
                 directory = tree[directory.prev]
                 continue
 
-            if name in tree:
-                directory = tree[name]
+            treename = os.path.join(directory.name, name)
+
+            if treename in tree:
+                directory = tree[treename]
                 continue 
 
             prev = directory 
 
             directory = Directory(name=name, prev=prev.name)
-            tree[name] = directory
+            tree[directory.name] = directory
 
     return tree
 
